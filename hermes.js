@@ -22,7 +22,7 @@ window.addEventListener('load', __hermes, false);
 
 window.hermes = {
 
-    version : '1.3.12',
+    version : '1.3.13',
 
     showVisualStatus    : true,
     storageAlias        : 'hermes.data',
