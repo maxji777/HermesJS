@@ -1,10 +1,56 @@
-## Synopsis
+# HermesJS
 
-At the top of the file there should be a short introduction and/ or overview that explains **what** the project is. This description should match descriptions added for package managers (Gemspec, package.json, etc.)
+#### HermesJS is a GreaseMonkey script to harvest data from web via javascript console.
 
-## Code Example
+HermesJS does web scrapping in "user" mode, running it from your browser - Firefox or Chrome. It gives you extreme flexibilty - you can interfere in the process as it goes - manually or via code. For example: you can manually login/authenticate or enter CAPTCHA to a restricted website, and then run a scrapper job to harvest data. HermesJS is controlled via javascript console. You can run or stop the scrapping process as you to fine-tune something. This is a quick way to harvest data without creating a complex solution and spending extra time on development.
 
-Show what the library does as concisely as possible, developers should be able to figure out **how** your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
+## How to use
+
+HermesJS requires GreaseMonkey extension for Firefox (TamperMonkey for Google Chrome) to be run. 
+As you have installed GreaseMonkey and added HermesJS, you would need to define and run a job. 
+
+## Jobs
+
+HermesJS uses jobs to define scrapping tasks. See basic scrapping job below:
+
+```javascript
+
+lm1 = {
+        startJob : function( hermes ) {
+            hermes.setUrls( links );
+            // reset gathered data
+            localStorage.setItem('hermes.lm.productUrls', JSON.stringify([]) );
+            // console.dir( JSON.parse( localStorage.getItem('hermes.urls') ) );
+        },
+        
+        processScrap : function( hermes ) {
+            var links = new Array();
+            $('#search-result-items li').each(function(el){
+                links.push( $(this).find('a.thumb-link').attr('href') ) ;
+            });
+
+            // if anything found, save to the list
+            if ( links.length > 0 ) {
+                var product_links = JSON.parse( localStorage.getItem('hermes.lm.productUrls') );
+                product_links.concat(links);
+                localStorage.setItem('hermes.lm.productUrls', JSON.stringify(product_links) );
+            }
+
+            return true; // true to continue, false to stop
+        },
+
+
+        // call when job is done
+        endJob : function() {
+            return true; // true to continue, false to show error
+        }
+    };
+    
+    
+    
+```
+
+Show what the library does as concisely as possible, developers should be able to fi**gure** out **how** your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
 
 ## Motivation
 
