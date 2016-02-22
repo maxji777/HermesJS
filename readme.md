@@ -6,10 +6,15 @@ HermesJS does web scrapping in "user" mode, running it from your browser - Firef
 
 HermesJS is controlled via javascript console. You can run or stop the scrapping process as you need to fine-tune something. This is a quick and easy way to harvest data without creating a complex solution and spending extra time on development.
 
+## Requirements
+
+- Mozilla Firefox or Google Chrome 
+- [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) (for Firefox) or [TamperMonkey](https://tampermonkey.net/) (for Chrome)
+
+
 ## How to use
 
-HermesJS requires GreaseMonkey extension for Firefox (TamperMonkey for Google Chrome) to be run. 
-As you have installed GreaseMonkey and added HermesJS, you would need to define and run a job. 
+Install GreaseMonkey (or TamperMonkey). Add HermesJS. You would need to define and run a job. 
 
 ## Jobs
 
