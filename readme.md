@@ -56,10 +56,14 @@ sampleJob = {
             return true; // true to continue, false to show error
         }
     };
-    
-    
-    
 ```
+
+Then, add job in javascript console.
+
+```javascript
+hermes.addJob(sampleJob);
+```
+
 
 
 ## Installation
