@@ -22,7 +22,7 @@ HermesJS uses jobs to define scrapping tasks. See basic scrapping job below:
 
 ```javascript
 
-lm1 = {
+sampleJob = {
 
         // stuff to do before job start
         startJob : function( hermes ) {
@@ -43,13 +43,16 @@ lm1 = {
             var title = $('h1').text();
             
             // return true to continue to next step
-            // or false to stop the process on current url (if data scrapping failed or value not found)
-            return true; // true to continue, false to stop
+            // or false to stop the process on current url (if data scrapping failed or element not found)
+            return true; 
         },
 
 
         // call when job is done
         endJob : function() {
+        
+            // $.ajax('save data to to database', data);
+        
             return true; // true to continue, false to show error
         }
     };
