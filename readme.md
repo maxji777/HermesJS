@@ -16,7 +16,7 @@ HermesJS is controlled via javascript console. You can run or stop the scrapping
 
 Install GreaseMonkey (or TamperMonkey). Add HermesJS. You would need to define and run a job. 
 
-## Jobs
+## Creating Jobs
 
 HermesJS uses jobs to define scrapping tasks. See basic scrapping job below:
 
