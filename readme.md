@@ -2,7 +2,9 @@
 
 #### HermesJS is a GreaseMonkey script to automate data harvesting in browser via console.
 
-HermesJS does web scrapping in "user" mode, running it from your browser - Firefox or Chrome. It gives you extreme flexibilty - you can interfere in the process as it goes - manually or via code. For example: you can manually login/authenticate or enter CAPTCHA to a restricted website, and then run a scrapper job to harvest data. HermesJS is controlled via javascript console. You can run or stop the scrapping process as you to fine-tune something. This is a quick way to harvest data without creating a complex solution and spending extra time on development.
+HermesJS does web scrapping in "user" mode, running it from your browser - Firefox or Chrome. It gives you extreme flexibilty - you can interfere in the process as it goes - manually or via code. For example: you can manually login/authenticate or enter CAPTCHA to a restricted website, and then run a scrapper job to harvest data. Or perform multi-step job, like first harvesting the links, and then going thru links to capture data. 
+
+HermesJS is controlled via javascript console. You can run or stop the scrapping process as you need to fine-tune something. This is a quick and easy way to harvest data without creating a complex solution and spending extra time on development.
 
 ## How to use
 
