@@ -43,8 +43,8 @@ sampleJob = {
             // grap page title
             var title = $('h1').text();
             
-            // return true to continue to next step
-            // or false to stop the process on current url (if data scrapping failed or element not found)
+            // return true to continue to next url
+            // or false to stop the process (if data scrapping failed or element not found)
             return true; 
         },
 
