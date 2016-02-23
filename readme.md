@@ -34,7 +34,12 @@ sampleJob = {
                 { name:'2', url:'http://www.aol.com' }
             ];
             
+            // tell hermes list of urls to walk thru
             hermes.setUrls( links );
+
+            // create an array where to save data
+            // (everything in hermes.data will be saved in localStorage)
+            hermes.data.titles = [];
         },
         
         // processScrap runs on every page HermesJS walks thru
@@ -43,6 +48,9 @@ sampleJob = {
             // grap page title
             var title = $('h1').text();
             
+            // add page title to our array for saving
+            hermes.data.titles.push(title);
+
             // return true to continue to next url
             // or false to stop the process (if data scrapping failed or element not found)
             return true; 
@@ -50,11 +58,30 @@ sampleJob = {
 
 
         // call when job is done
-        endJob : function() {
+        endJob : function( hermes ) {
         
-            // $.ajax('save data to to database', data);
-        
-            return true; // true to continue, false to show error
+            // save harvested data to your server database
+            $.post({
+                url: 'localhost/hermes.php',
+                data: {
+                    request: 'save_titles',
+                    titles : hermes.data.titles
+                },
+                success: function(data) {
+                    if (typeof data.success != undefined && data.success) {
+                        hermes.log('data saved');
+                    } else {
+                        hermes.log('server error (probably)');
+                    }
+                },
+                error : function() { 
+                    hermes.log('request failed'); 
+                }
+            });
+
+            // true to continue, 
+            // false to show error
+            return true; 
         }
     };
 ```
