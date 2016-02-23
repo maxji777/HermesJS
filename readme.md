@@ -24,7 +24,7 @@ HermesJS uses jobs to define scrapping tasks. See basic scrapping job below:
 
 sampleJob = {
 
-        // stuff to do before job start
+        // stuff to do before job starts
         startJob : function( hermes ) {
 
             // list of urls to walk thru
