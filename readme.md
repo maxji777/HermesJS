@@ -30,8 +30,9 @@ sampleJob = {
 
             // list of urls to walk thru
             var links = [
-                { name:'1', url:'http://www.yahoo.com' },
-                { name:'2', url:'http://www.aol.com' }
+                { name:'1', url:'http://www.yahoo.com' },       // either as an object
+                'http://www.apple.com',                         // or a string
+                'http://www.nba.com'
             ];
             
             // tell hermes list of urls to walk thru
