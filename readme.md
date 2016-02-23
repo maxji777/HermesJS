@@ -43,6 +43,8 @@ sampleJob = {
             hermes.data.titles = [];
         },
         
+        
+        
         // processScrap runs on every page HermesJS walks thru
         processScrap : function( hermes ) {
         
@@ -56,6 +58,7 @@ sampleJob = {
             // or false to stop the process (if data scrapping failed or element not found)
             return true; 
         },
+
 
 
         // call when job is done
