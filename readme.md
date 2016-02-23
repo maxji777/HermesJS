@@ -10,6 +10,7 @@ HermesJS is controlled via javascript console. You can run or stop the scrapping
 
 - Mozilla Firefox or Google Chrome 
 - [GreaseMonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) (for Firefox) or [TamperMonkey](https://tampermonkey.net/) (for Chrome)
+- (optional) jQuery or similar for simplicity
 
 
 ## How to use
