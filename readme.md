@@ -66,17 +66,7 @@ sampleJob = {
                 data: {
                     request: 'save_titles',
                     titles : hermes.data.titles
-                },
-                success: function(data) {
-                    if (typeof data.success != undefined && data.success) {
-                        hermes.log('data saved');
-                    } else {
-                        hermes.log('server error (probably)');
-                    }
-                },
-                error : function() { 
-                    hermes.log('request failed'); 
-                }
+                } 
             });
 
             // true to continue, 
