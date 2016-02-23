@@ -99,7 +99,7 @@ Your backend script to capture and save data passed from Hermes.
 In the example: localhost/hermes.php
 
 ```php
-
+<?php
 // make sure request is not blocked by browser policy
 header('Access-Control-Allow-Origin: *');
 
@@ -116,7 +116,6 @@ if (isset($_POST['request']) && $_POST['request']=='save_titles') {
         
     exit;
 }
-
 ```
 
 
