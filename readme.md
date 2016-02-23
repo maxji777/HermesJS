@@ -122,4 +122,4 @@ That's it!
 
 ### More Examples
 
-There are more [sample jobs](/maxji777/HermesJS/blob/master/sample_jobs.js), also they are more complex. Sometimes you need to first walk thru several urls to gather further list of links to harvest info from. I used those jobs to harvest product data with images to import into a local store website. 
+There are more [sample jobs](//maxji777/HermesJS/blob/master/sample_jobs.js), also they are more complex. Sometimes you need to first walk thru several urls to gather further list of links to harvest info from. I used those jobs to harvest product data with images to import into a local store website. 
