@@ -80,7 +80,7 @@ sampleJob = {
     };
 ```
 
-Then, add and run the job in javascript console.
+Then, add and run the job.
 
 ```javascript
 hermes.addJob(sampleJob);
