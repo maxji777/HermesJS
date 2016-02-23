@@ -261,6 +261,8 @@ window.hermes = {
 
 
     addJob : function(job) {
+        
+        /* 
         if ( typeof job != 'string' ) {
             this.log('cannot add job cause its not string');
             return false;
@@ -269,6 +271,21 @@ window.hermes = {
             this.log('the job ' + job + ' does not exist in hermesjobs object');
             return false;
         }
+        */
+        
+        if ( typeof job != 'object' ) {
+            this.log('cannot add job because it is not an object');
+            return false;
+        }
+        
+        if ( typeof job.startJob != 'function' 
+            || typeof job.processScrap != 'function'
+            || typeof job.endJob != 'function') 
+        {
+            this.log('cannot add job, it has to have startJob, processScrap, endJob callback functions defined');
+            return false;
+        }
+        
         this.data.jobs.push(job);
         this.saveConfig();
         this.log('job added: ' + job);
