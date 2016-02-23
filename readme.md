@@ -19,7 +19,7 @@ Install GreaseMonkey (or TamperMonkey). Add HermesJS. You would need to define a
 
 ### Creating Jobs
 
-Using javascript console, define scrapping jobs. See basic scrapping job below:
+Using javascript console, define scrapping jobs. See basic example below:
 
 ```javascript
 
