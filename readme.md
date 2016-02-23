@@ -69,7 +69,7 @@ sampleJob = {
                 url: 'localhost/hermes.php',
                 data: {
                     request: 'save_titles',
-                    titles : hermes.data.titles
+                    titles : JSON.stringify(hermes.data.titles)
                 } 
             });
 
@@ -93,6 +93,31 @@ Or, you can do it in one line:
 hermes.startJob(sampleJob);
 ```
 
+### Server-side
+
+Your backend script to capture and save data passed from Hermes. 
+In the example: localhost/hermes.php
+
+```php
+
+// make sure request is not blocked by browser policy
+header('Access-Control-Allow-Origin: *');
+
+if (isset($_POST['request']) && $_POST['request']=='save_titles') {
+    
+    $titles = json_decode($_POST['titles'], true);
+    foreach($titles as $title) {
+        db()->sql('insert into titles set title=?', [ $title ]);
+    }
+    
+    echo json_encode([
+        'success' => true
+    ]);
+        
+    exit;
+}
+
+```
 
 
 ## Installation
