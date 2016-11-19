@@ -1,4 +1,5 @@
-# HermesJS
+# HermesJS 
+##### v 1.4.4
 
 #### HermesJS is a GreaseMonkey script to automate data harvesting in browser via console.
 
