@@ -22,25 +22,7 @@ window.hermesjobs = {
     },
     
     storageAlias : 'hermes.courts.data',
-    
-    addField : function(name, selector, value, extra) {
-        
-        // this.hermes.log('adding field: ' + name);
-        
-        if ( this.hermes.isArray( name ) ) {
-            for (var i=0; i<name.length; i++) {
-                var n = name[i];
-                this.addField( n[0], n[1], n[2], typeof n[3] != 'undefined' ? n[3] : null );
-            }
-        } else {
-            this.data.fields.push({ 
-                    name: name, 
-                    selector: selector,
-                    value: value,
-                    extra: extra
-                });
-        }        
-    },
+     
     
     initJob : function(hermes) {
         
@@ -97,44 +79,7 @@ window.hermesjobs = {
             if (field.selector === null) {
                 if ( field.value == 'function' ) {
                     if (typeof field.extra == 'function') {
-                        value = field.extra(this);
-                    } else {
-                        this.hermes.log('FATAL: invalid field config ['+i+'] (' +field.name+ '), value is function, extra is not');
-                        this.hermes.x(); // stop, fatal error    
-                    }
-                    
-                } else {
-                    this.hermes.log('FATAL: invalid field config ['+i+'] (' +field.name+ ')');
-                    this.hermes.x(); // stop, fatal error
-                }
-            } else {
-                // selector based
-                var elem = $(field.selector);
-                if (elem.length) {
-                    
-                    // if element exists
-                    switch(field.value) {
-                        case 'text' : value = elem.text(); break;
-                        case 'href' : value = elem.attr('href'); break;
-                        case 'attr' : value = elem.attr(field.extra); break;
-                        case 'mapJoin' : value = elem.map(field.extra).get().join(); break;
-                        default : 
-                            this.hermes.log('FATAL: field config ['+i+'] ('+field.name+'), field.value is not supported: ' + field.value);
-                            this.hermes.x();                            
-                    }                    
-                    
-                } else {
-                    this.hermes.log('WARNING: field ['+i+'] ('+field.name+') selector did not match any element');
-                }
-            }
-            
-            item[field.name] = value;
-        }
-        
-        return item;
-    },
-    
-
+ 
     
     startJob : function( hermes ) {
 
