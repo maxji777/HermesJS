@@ -2,8 +2,8 @@
 // @name        HermesJS
 // @namespace   hermes
 // @description Hermes makes web scrapping easy.
-// @include     jquery
-// @version     1.3.13
+// @require     https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js
+// @version     1.4.4
 // ==/UserScript==
 
 // --- do not run on iframes ---
@@ -15,12 +15,11 @@ if (window.top!=window.self) {
 function __hermes() { window.hermes.init(); }
 window.addEventListener('load', __hermes, false);
 
-
 // ----------------------------- hermes -------------------------------------
 
 window.hermes = {
 
-    version : '1.3.13',
+    version : '1.4.4',
 
     showVisualStatus    : true,
     storageAlias        : 'hermes.data',
@@ -39,7 +38,11 @@ window.hermes = {
         currentJob : 0,
         jobStarted : null, // when job started
 
-        expectingAjax : false
+        expectingAjax : false,
+        
+        harvesting : {
+            fields : []
+        }
     },
 
     configLoaded : false,
@@ -47,15 +50,17 @@ window.hermes = {
 
     getExecutionTime : function() {
         if ( !this.data.jobStarted )
-            return '( not running )';
-        return this.formatTimeSeconds( (new Date().getTime() - this.data.jobStarted)/1000 );
+            return '( not running )';        
+        var seconds = Math.round( (new Date().getTime() - this.data.jobStarted)/1000 ) ;
+        var seconds_elapsed =  Math.round( seconds / ((this.data.step+1) / this.data.urls.length));        
+        return this.formatTimeSeconds( seconds ) + ' ('+this.formatTimeSeconds(seconds_elapsed) +')';
     },
 
 
     formatTimeSeconds : function(totalSec) {
         var hours = parseInt( totalSec / 3600 ) % 24;
         var minutes = parseInt( totalSec / 60 ) % 60;
-        var seconds = totalSec % 60;
+        var seconds = Math.round(totalSec % 60);
         return ( hours ? ( hours < 10 ? "0" + hours : hours ) + 'h ' : '' ) +
             ( minutes < 10 ? "0" + minutes : minutes) + "m " +
             (seconds  < 10 ? "0" + seconds : seconds) + 's';
@@ -72,9 +77,9 @@ window.hermes = {
             percent =  'No urls are in the list.';
         else
             percent = Math.round( (this.data.step+1) / this.data.urls.length * 10000 ) / 100 
-                + ' % (' + this.data.step + ' of '+this.data.urls.length+')' ;
+                + ' % (' + this.data.step + ' of '+this.data.urls.length+' / '  +(this.data.urls.length-this.data.step-1)+ ' left)' ;
 
-        return 'Progress: ' + percent + ' &nbsp;&nbsp;&nbsp; time: ' + this.getExecutionTime();
+        return 'Progress: ' + percent + '<br /> time: ' + this.getExecutionTime();
     },
 
 
@@ -132,7 +137,7 @@ window.hermes = {
     },
 
     reset : function() {
-        this.data = {
+       this.data = {
             urls : [],
 
             // in the job
@@ -140,10 +145,15 @@ window.hermes = {
             isRunning : false,
 
             jobs : [],
-            currentJob : 0
-        };
-
-        this.saveConfig();
+            currentJob : 0,
+           
+           harvesting : {  
+               fields: [] 
+           }   
+       };
+        
+       this.log('-- hermes has been reset --');
+       this.saveConfig();
     },
 
     clear : function() {
@@ -152,6 +162,7 @@ window.hermes = {
 
 
     x : function() {
+        // alert('x called');
         localStorage.setItem('hermes.stopRequested', true);
     },
 
@@ -165,6 +176,7 @@ window.hermes = {
     boot : function() {
 
         var lines = [];
+                
         lines.push( 'hermes/'+this.version );
 
         if (this.configLoaded && this.data.isRunning)
@@ -178,8 +190,10 @@ window.hermes = {
 
         if ( this.showVisualStatus )
             $("body").append( "<div id='hermes-console' style='"+
-            "position:absolute;font-family:lucida sans unicode;font-size:12px;left:0;top:0;background-color:red;color:white;padding:3px"+
-            "'>"+lines.join('<br />')+"</div>" );
+            "position:absolute;opacity:0.8;font-family:lucida sans unicode;font-size:12px;left:0;top:0;background-color:red;color:white;padding:3px"+
+            "'>"+
+            (this.data.isRunning ? '<a href="javascript:window.hermes.x()" style="color:white">[X]</a> <a href="javascript:window.hermes.xc()" style="color:white">[XC]</a> &nbsp;' : '' )+                 
+            lines.join('<br />')+"</div>" );
 
         if (this.data.isRunning) {
             this.log( 'URL: ' + this.getUrl() );
@@ -199,6 +213,11 @@ window.hermes = {
             if ( this.data.isRunning ) {
                 console.log('work in progress ..');
                 console.log( this.getProgress() );
+                
+                console.log('prepopulate job');
+                
+                
+                
                 // scrapping session is running
                 console.log('..initCurrentJob..');
                 this.initCurrentJob();
@@ -228,6 +247,9 @@ window.hermes = {
 
 
     gotoNextUrl : function () {
+        
+        this.log(' next url --- ');
+        
         this.data.step ++;
         if ( !this.isStopRequested() ) // this.data.step < 3 )
             this.continueNext();
@@ -250,7 +272,12 @@ window.hermes = {
         if (typeof name=='undefined') {
             // get current job
             name = this.data.jobs[ this.data.currentJob ];
-        }
+        }       
+        
+        // if (typeof name == 'object') {
+        //    return name;
+        // }
+        
         if ( typeof window.hermesjobs[ name ] != 'object' ) {
             console.log('cannot get the job ' + name + ' does not exist in hermesjobs object');
             return false;
@@ -262,25 +289,45 @@ window.hermes = {
 
     addJob : function(job) {
         
-        /* 
+        
+        
+        
+         
         if ( typeof job != 'string' ) {
             this.log('cannot add job cause its not string');
             return false;
         }
+        
         if ( typeof window.hermesjobs[ job ] != 'object' ) {
             this.log('the job ' + job + ' does not exist in hermesjobs object');
             return false;
         }
+        
+        var _job = window.hermesjobs[job];
+        
+        /*
+        if (typeof job == 'string') {
+            if ( typeof window.hermesjobs[ job ] != 'object' ) {
+                this.log('the job ' + job + ' does not exist in hermesjobs object');
+                return false;
+            } 
+            var _name = job;
+            job = window.hermesjobs[job];
+            job['_name'] = _name;
+        }
         */
         
+        /*
         if ( typeof job != 'object' ) {
             this.log('cannot add job because it is not an object');
             return false;
         }
+        */
         
-        if ( typeof job.startJob != 'function' 
-            || typeof job.processScrap != 'function'
-            || typeof job.endJob != 'function') 
+        
+        if ( typeof _job.startJob != 'function' 
+            || typeof _job.processScrap != 'function'
+            || typeof _job.endJob != 'function') 
         {
             this.log('cannot add job, it has to have startJob, processScrap, endJob callback functions defined');
             return false;
@@ -288,7 +335,7 @@ window.hermes = {
         
         this.data.jobs.push(job);
         this.saveConfig();
-        this.log('job added: ' + job);
+        this.log('job added: ' + job + ' / ' + ( typeof _job.name != 'undefined' ? _job.name : 'untitled job' ));
         return true;
     },
 
@@ -326,6 +373,10 @@ window.hermes = {
     },
 
 
+    /*
+       getUrl() get currenct url
+       getUrl(int step) get url of index 'step'    
+    */
     getUrl : function( index ) {
 
         if ( typeof index == 'undefined' )
@@ -475,6 +526,11 @@ window.hermes = {
         }
     },
 
+    
+    getJobName : function(job) {
+        var _job = this.getJob(job);
+        return typeof _job.name != 'undefined' ? _job.name : 'untitled';
+    },
 
 
     startCurrentJob : function() {
@@ -490,11 +546,11 @@ window.hermes = {
 
 
     processScrapCurrentJob : function() {
-        var job = this.getJob( this.data.jobs[ this.data.currentJob ] );
+        var job = this.getJob(); // this.data.jobs[ this.data.currentJob ] );
         if ( typeof job == 'object' && typeof job.processScrap == 'function' ) {
             return job.processScrap(this);
         } else {
-            this.log('cannot processScrap on the job ' + this.data.jobs[ this.data.currentJob ]);
+            this.log('cannot processScrap on the job ' + this.getJobName() );
             return false; //////////////////
         }
     },
@@ -502,8 +558,13 @@ window.hermes = {
 
     initCurrentJob : function() {
         var job = this.getJob();
-        if (typeof job.initJob == 'function')
+        // console.log(job);
+        job.hermes = this;
+        if (typeof job.initJob == 'function') {
             job.initJob(this);
+        } else {
+            this.log('cannot initCurrenJob, typeof = ' + typeof(job.initJob) );
+        }
     },
 
 
@@ -553,14 +614,98 @@ window.hermes = {
                 oldSend.apply(this, arguments);
             }
         }
-    }
+    },
+    
+    
+    isArray : function(arg) {
+        return Object.prototype.toString.call(arg) === '[object Array]';
+    },
+    
+    
+    // -------------- harvesting helpers -------------------
+    
+    harvesting : {
+        
+        resetFields : function() { window.hermes.data.harvesting.fields = []; },
+        
+        addField : function(name, selector, value, extra) {
 
+            // window.hermes.log('adding field: ' + name);
 
+            if ( window.hermes.isArray( name ) ) {
+                for (var i=0; i<name.length; i++) {
+                    var n = name[i];
+                    this.addField( n[0], n[1], n[2], typeof n[3] != 'undefined' ? n[3] : null );
+                }
+            } else {
+                window.hermes.data.harvesting.fields.push({ 
+                        name: name, 
+                        selector: selector,
+                        value: value,
+                        extra: extra
+                    });
+            }        
+        },
+        
+        
+        harvestFields : function() {
+        
+            var item = {};
 
+            for(var i=0; i<window.hermes.data.harvesting.fields.length; i++) {
+
+                var field = window.hermes.data.harvesting.fields[i];
+                var value = null;
+
+                // log
+                // this.hermes.log('field: ' + field.name);
+
+                if (field.selector === null) {
+                    if ( field.value == 'function' ) {
+                        if (typeof field.extra == 'function') {
+                            value = field.extra( window.hermes.getJob() );
+                        } else {
+                            this.hermes.log('FATAL: invalid field config ['+i+'] (' +field.name+ '), value is function, extra is not');
+                            this.hermes.x(); // stop, fatal error    
+                        }
+
+                    } else {
+                        this.hermes.log('FATAL: invalid field config ['+i+'] (' +field.name+ ')');
+                        this.hermes.x(); // stop, fatal error
+                    }
+                } else {
+                    // selector based
+                    var elem = $(field.selector);
+                    if (elem.length) {
+
+                        // if element exists
+                        switch(field.value) {
+                            case 'text' : value = elem.text(); break;
+                            case 'href' : value = elem.attr('href'); break;
+                            case 'attr' : value = elem.attr(field.extra); break;
+                            case 'mapJoin' : value = elem.map(field.extra).get().join(); break;
+                            default : 
+                                this.hermes.log('FATAL: field config ['+i+'] ('+field.name+'), field.value is not supported: ' + field.value);
+                                this.hermes.x();                            
+                        }                    
+
+                    } else {
+                        window.hermes.log('WARNING: field ['+i+'] ('+field.name+') selector did not match any element');
+                    }
+                }
+
+                item[field.name] = value;
+            }
+
+            return item;
+        }
+
+   }
 
 } ;
 
 window.hermes.boot();
+ 
 
 
 // #######################################################################################################################################################################
